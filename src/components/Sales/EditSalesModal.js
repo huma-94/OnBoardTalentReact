@@ -27,7 +27,7 @@ export class EditSalesModal extends Component
     handleSubmit(event){
         event.preventDefault();
 
-        fetch('https://localhost:44338/api/Sales',{
+        fetch('https://localhost:44340/api/Sales',{
             method:'PUT',
             headers:{
                 'Accept':'application/json',
@@ -142,7 +142,7 @@ export class EditSalesModal extends Component
                         <Form.Group controlId="DateSold">
                             <Form.Label>DateSold</Form.Label>
                             <Form.Control
-                            type="text"
+                            type="date"
                             Name="Date Sold"
                             required
                             defaultValue={this.props.salDateSold}

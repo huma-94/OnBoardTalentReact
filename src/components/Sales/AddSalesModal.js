@@ -23,7 +23,7 @@ export class AddSalesModal extends Component{
     handleSubmit(event){
         event.preventDefault();
 
-        fetch('https://localhost:44338/api/Sales',{
+        fetch('https://localhost:44340/api/Sales',{
             method:'POST',
             headers:{
                 'Accept':'application/json',

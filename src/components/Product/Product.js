@@ -5,9 +5,16 @@ import {Table} from 'react-bootstrap';
 import {Button,ButtonToolbar}  from 'react-bootstrap';
 import {EditPrdModal} from './EditPrdModal';
 import { AddPrdModal } from './AddPrdModal';
+import orderBy from 'lodash/orderBy';
+import SwapVertIcon from '@material-ui/icons/SwapVert';
+import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
 
 
-
+const invertDirection = {
+    asc :'desc',
+    desc : 'asc'
+}
 
 
 //Product component class.
@@ -15,7 +22,8 @@ export class Product extends Component{
 
     constructor(props){
         super(props);
-        this.state={prd:[],addModalShow :false , editModalShow : false}
+        this.state={prd:[],addModalShow :false , editModalShow : false,
+                    columnToSort :'Id',sortDirection:'asc'}
     }
 
 
@@ -33,12 +41,11 @@ export class Product extends Component{
     //Refresh list call the API to get the product details list
     getProduct()
     {
-        fetch('https://localhost:44338/api/Product')
+        fetch('https://localhost:44340/api/Product')
         .then(response=>response.json())
         .then(data=> {
-            this.setState({prd:data});
-        }
-            );
+            this.setState({prd:orderBy(data,this.state.columnToSort,this.state.sortDirection)});
+        });
     }
 
 
@@ -56,7 +63,7 @@ export class Product extends Component{
    {
        if( window.confirm('Are you sure?'))
        {
-           fetch('https://localhost:44338/api/Product/'+ prdId,{
+           fetch('https://localhost:44340/api/Product/'+ prdId,{
             method:'DELETE',
             header:{'Accept ': 'application/json',
                'Content-Type':'application/json'
@@ -64,6 +71,21 @@ export class Product extends Component{
            })   
        }
    }
+
+
+   handleSort(props)
+   {
+      
+      this.setState(state=>({
+       columnToSort:props,
+       sortDirection : state.columnToSort===props ? invertDirection[state.sortDirection] : "asc"
+   
+   }))
+
+  this.state.prd=orderBy(this.state.prd,this.state.columnToSort,this.state.sortDirection);
+       console.log(this.state.columnToSort,this.state.sortDirection);
+   }
+
      
     
    
@@ -91,9 +113,30 @@ export class Product extends Component{
             <Table className='mt-4' striped bordered hover size="sm">
                 <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Price</th> 
+                        <th><div 
+                        onClick={()=>this.handleSort('Id')}>
+                        <span>Id</span>                           
+                        {this.state.columnToSort==='Id'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th>
+
+                        <th><div 
+                        onClick={()=>this.handleSort('Name')}>
+                        <span>Name</span>                           
+                        {this.state.columnToSort==='Name'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th>
+
+                        <th><div 
+                        onClick={()=>this.handleSort('Price')}>
+                        <span>Price</span>                           
+                        {this.state.columnToSort==='Price'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th> 
+
                         <th>Action</th>                          
                     </tr>
                 </thead>

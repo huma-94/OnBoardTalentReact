@@ -25,7 +25,7 @@ export class AddCustModal extends Component{
     handleSubmit(event){
         event.preventDefault();
 
-        fetch('https://localhost:44338/api/Customer',{
+        fetch('https://localhost:44340/api/Customer',{
             method:'POST',
             headers:{
                 'Accept':'application/json',

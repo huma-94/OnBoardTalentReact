@@ -1,11 +1,19 @@
 //This is the store pages of the talent project
-
-
 import React,{Component} from 'react';
 import {Table} from 'react-bootstrap';
 import {Button,ButtonToolbar}  from 'react-bootstrap';
 import { AddStoreModal } from './AddStoreModal';
 import {EditStoreModal} from './EditStoreModal';
+import orderBy from 'lodash/orderBy';
+import SwapVertIcon from '@material-ui/icons/SwapVert';
+import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
+
+
+const invertDirection = {
+    asc :'desc',
+    desc : 'asc'
+}
 
 
 //this is store component class
@@ -13,7 +21,8 @@ export class Store extends Component{
 
     constructor(props){
         super(props);
-        this.state={str:[], addModalShow :false , editModalShow : false}
+        this.state={str:[], addModalShow :false , editModalShow : false,
+            columnToSort :'Id',sortDirection:'asc' }
     }
 
     /////This is to load Store details when react DOM is mounted
@@ -29,12 +38,11 @@ export class Store extends Component{
     //Refresh list call the API to get the store details list
     getStore(){
         
-        fetch('https://localhost:44338/api/Store')
+        fetch('https://localhost:44340/api/Store')
         .then(response=>response.json())
         .then(data=> {
-            this.setState({str:data});
-        }
-         );
+            this.setState({str:orderBy(data,this.state.columnToSort,this.state.sortDirection)});
+        });
     }  
     
     
@@ -49,14 +57,39 @@ export class Store extends Component{
         {
             if( window.confirm('Are you sure?'))
             {
-                fetch('https://localhost:44338/api/Store/'+strId,{
+                fetch('https://localhost:44340/api/Store/'+strId,{
                  method:'DELETE',
                  header:{'Accept ': 'application/json',
                     'Content-Type':'application/json'
                 }
-                })   
-            }
+                })
+                .then(res=> res.json())
+            .then((result)=>
+            {
+                           
+                alert('Successful');
+                     
+            },
+             (error)=>
+             {
+                alert('Failed');
+
+            })
+         }
         }
+        handleSort(props)
+        {
+           
+           this.setState(state=>({
+            columnToSort:props,
+            sortDirection : state.columnToSort===props ? invertDirection[state.sortDirection] : "asc"
+        
+        }))
+    
+       this.state.prd=orderBy(this.state.prd,this.state.columnToSort,this.state.sortDirection);
+            console.log(this.state.columnToSort,this.state.sortDirection);
+        }
+      
      
     //This is to render store table details
     render(){
@@ -81,9 +114,29 @@ export class Store extends Component{
             <Table className='mt-4' striped bordered hover size="sm">
                 <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Name</th>
-                        <th>Address</th> 
+                        <th><div 
+                        onClick={()=>this.handleSort('Id')}>
+                        <span>Id</span>                           
+                        {this.state.columnToSort==='Id'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th>
+
+                        <th><div 
+                        onClick={()=>this.handleSort('Name')}>
+                        <span>Name</span>                           
+                        {this.state.columnToSort==='Name'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th>
+
+                        <th><div 
+                        onClick={()=>this.handleSort('Address')}>
+                        <span>Address</span>                           
+                        {this.state.columnToSort==='Address'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th> 
                         <th>Action</th>                          
                     </tr>
                 </thead>

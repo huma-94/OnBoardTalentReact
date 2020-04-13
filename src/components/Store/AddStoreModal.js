@@ -29,7 +29,7 @@ export class AddStoreModal extends Component
     {
         event.preventDefault();
 
-        fetch('https://localhost:44338/api/Store',{
+        fetch('https://localhost:44340/api/Store',{
             method:'POST',
             headers:{
                 'Accept':'application/json',

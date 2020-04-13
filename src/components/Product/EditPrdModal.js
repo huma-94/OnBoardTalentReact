@@ -26,7 +26,7 @@ export class EditPrdModal extends Component{
     handleSubmit(event){
         event.preventDefault();
 
-        fetch('https://localhost:44338/api/Product',{
+        fetch('https://localhost:44340/api/Product',{
             method:'PUT',
             headers:{
                 'Accept':'application/json',

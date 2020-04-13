@@ -27,7 +27,7 @@ export class AddPrdModal extends Component{
     {
         event.preventDefault();
 
-        fetch('https://localhost:44338/api/Product',{
+        fetch('https://localhost:44340/api/Product',{
             method:'POST',
             headers:{
                 'Accept':'application/json',

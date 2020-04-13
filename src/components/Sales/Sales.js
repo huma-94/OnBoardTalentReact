@@ -5,21 +5,38 @@ import {Table} from 'react-bootstrap';
 import {Button,ButtonToolbar}  from 'react-bootstrap';
 import { AddSalesModal } from './AddSalesModal';
 import {EditSalesModal} from './EditSalesModal';
+import orderBy from 'lodash/orderBy';
+import SwapVertIcon from '@material-ui/icons/SwapVert';
+import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
+
+
+const invertDirection = {
+    asc :'desc',
+    desc : 'asc'
+}
 
 
 //Sales Component class
-export class Sales extends Component{
+export class Sales extends Component
+{
 
-    constructor(props){
-        super(props);
-        this.state={sal:[], addModalShow :false , editModalShow : false}
-    }
+        constructor(props)
+        {
+             super(props);
+             this.state={sal:[], addModalShow :false , editModalShow : false,
+                                columnToSort :'Id',sortDirection:'asc'}
+        }
+    
 
 //This is to load sales details when react DOM is mounted
     componentDidMount()
     {
         this.getSales();
     }
+
+
+
 
 
  //This function is to fetch the sales details by implementing GET API method.
@@ -30,13 +47,13 @@ export class Sales extends Component{
     getSales()
     {
         
-        fetch('https://localhost:44338/api/Sales')
+        fetch('https://localhost:44340/api/Sales')
         .then(response=>response.json())
         .then(data=> {
-            this.setState({sal:data});
-        }
-         );
+            this.setState({sal:orderBy(data,this.state.columnToSort,this.state.sortDirection)});
+        });
     } 
+
     
     //Retreive sales details upon request 
      componentDidUpdate()
@@ -50,7 +67,7 @@ export class Sales extends Component{
     {
         if( window.confirm('Are you sure?'))
         {
-            fetch('https://localhost:44338/api/Sales/'+salId,{
+            fetch('https://localhost:44340/api/Sales/'+salId,{
              method:'DELETE',
             header:{'Accept ': 'application/json',
                     'Content-Type':'application/json'
@@ -68,6 +85,20 @@ export class Sales extends Component{
                 )
             }
         }
+
+        handleSort(props)
+        {
+           
+           this.setState(state=>({
+            columnToSort:props,
+            sortDirection : state.columnToSort===props ? invertDirection[state.sortDirection] : "asc"
+        
+        }))
+    
+       this.state.sal=orderBy(this.state.sal,this.state.columnToSort,this.state.sortDirection);
+            console.log(this.state.columnToSort,this.state.sortDirection);
+        }
+      
      
     //This is to render sales details
     render()
@@ -95,11 +126,46 @@ export class Sales extends Component{
                  <Table className='mt-4' striped bordered hover size="sm">
                 <thead>
                     <tr>
-                        <th>Id</th>
-                        <th>Product Name</th>
-                        <th>Customer Name</th> 
-                        <th>Store Name</th> 
-                        <th>Date Of Sale</th> 
+                        <th><div 
+                        onClick={()=>this.handleSort('Id')}>
+                        <span>Id</span>                           
+                        {this.state.columnToSort==='Id'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th>
+
+                        <th><div 
+                        onClick={()=>this.handleSort('PName')}>
+                        <span>Product Name</span>                           
+                        {this.state.columnToSort==='PName'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th>
+
+                        <th><div 
+                        onClick={()=>this.handleSort('CName')}>
+                        <span>Customer Name</span>                           
+                        {this.state.columnToSort==='CName'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th> 
+
+                        <th><div 
+                        onClick={()=>this.handleSort('SName')}>
+                        <span>Store Name</span>                           
+                        {this.state.columnToSort==='SName'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th>
+
+                        <th><div 
+                        onClick={()=>this.handleSort('DateSold')}>
+                        <span>Date of Sale</span>                           
+                        {this.state.columnToSort==='DateSold'?
+                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
+                         :null }                       
+                        </div></th> 
+                        
                         <th>Action</th>                          
                     </tr>
                 </thead>
