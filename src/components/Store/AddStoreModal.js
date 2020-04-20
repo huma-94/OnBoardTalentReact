@@ -28,8 +28,22 @@ export class AddStoreModal extends Component
     handleSubmit(event)
     {
         event.preventDefault();
+        console.log(event.target.Name.value.length,event.target.Name.value.trim().length);
+        if(event.target.Name.value.trim().length==0)
+       { 
+        console.log('Here');
+        this.setState({snackbaropen:true,snackbarmsg:'Enter Valid Customer Name'});
+       }
+      else if(event.target.Address.value.trim().length==0)
+       {
+        this.setState({snackbaropen:true,snackbarmsg:'Enter Valid Address'});
 
-        fetch('https://localhost:44340/api/Store',{
+       }
+     
+        else
+        {
+
+        fetch('https://demotalent.azurewebsites.net/api/Store',{
             method:'POST',
             headers:{
                 'Accept':'application/json',
@@ -52,9 +66,9 @@ export class AddStoreModal extends Component
             this.setState({snackbaropen:true, snackbarmsg:'Failed'});
         }
         )
-
-        
     }
+        
+ }
 
 
     render(){
@@ -83,10 +97,10 @@ export class AddStoreModal extends Component
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-    <Modal.Header closeButton>
+    <Modal.Header>
 
         <Modal.Title id="contained-modal-title-vcenter">
-          Add New Store
+          Create Store
         </Modal.Title>
 
     </Modal.Header>
@@ -95,7 +109,7 @@ export class AddStoreModal extends Component
                     <Col sm={6}>
                         <Form onSubmit={this.handleSubmit}>
                             <Form.Group controlId="Name">
-                                <Form.Label>Name</Form.Label>
+                                <Form.Label>NAME</Form.Label>
                                 <Form.Control
                                 type="text"
                                 Name="Store Name"
@@ -104,7 +118,7 @@ export class AddStoreModal extends Component
                             </Form.Group>
 
                             <Form.Group controlId="Address">
-                                <Form.Label>Addresss</Form.Label>
+                                <Form.Label>ADDRESS</Form.Label>
                                 <Form.Control
                                 type="text"
                                 Name="Store Address"
@@ -112,9 +126,9 @@ export class AddStoreModal extends Component
                                 placeholder="Enter Store Address"/>
                             </Form.Group>
 
-                                <Button variant="primary" type="submit">
-                                    Add Store
-                                </Button>
+                            <Button  variant="dark" className= 'ml-0 mt-2' onClick={this.props.onHide}>Cancel</Button>
+                            <Button variant="success" className= 'ml-3 mt-2' type="submit">
+                                    Add Store </Button>
                                 
                         </Form>
                     </Col>
@@ -123,9 +137,7 @@ export class AddStoreModal extends Component
             </Modal.Body>
 
 
-      <Modal.Footer>
-        <Button  variant="danger" onClick={this.props.onHide}>Close</Button>
-      </Modal.Footer>
+      
 
 </Modal>
 </div>

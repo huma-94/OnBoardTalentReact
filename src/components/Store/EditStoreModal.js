@@ -27,14 +27,14 @@ export class EditStoreModal extends Component{
     handleSubmit(event){
         event.preventDefault();
 
-        fetch('https://localhost:44340/api/Store',{
+        fetch('https://demotalent.azurewebsites.net/api/Store',{
             method:'PUT',
             headers:{
                 'Accept':'application/json',
                 'content-type':'application/json'
             },
             body:JSON.stringify({
-                Id:event.target.Id.value,
+                Id:this.props.strId,
                 Name: event.target.Name.value,
                 Address:event.target.Address.value
             })
@@ -81,7 +81,7 @@ export class EditStoreModal extends Component{
       aria-labelledby="contained-modal-title-center"
       centered
     >
-<Modal.Header closeButton>
+<Modal.Header >
         <Modal.Title id="contained-modal-title-vcenter">
           Edit  Store
         </Modal.Title>
@@ -89,21 +89,10 @@ export class EditStoreModal extends Component{
         <Modal.Body>
               <Row>
                     <Col sm={6}>
-                    <Form onSubmit={this.handleSubmit}>
-
-                    <Form.Group controlId="Id">
-                            <Form.Label>Id</Form.Label>
-                            <Form.Control
-                            type="text"
-                            Name="Store Id"
-                            required
-                            disabled
-                            defaultValue={this.props.strId}
-                            placeholder="Store Id"/>
-                        </Form.Group>
+                    <Form onSubmit={this.handleSubmit}>                    
 
                         <Form.Group controlId="Name">
-                            <Form.Label>Name</Form.Label>
+                            <Form.Label>NAME</Form.Label>
                             <Form.Control
                             type="text"
                             Name="Store Name"
@@ -114,7 +103,7 @@ export class EditStoreModal extends Component{
                         </Form.Group>
 
                         <Form.Group controlId="Address">
-                            <Form.Label>Addresss</Form.Label>
+                            <Form.Label>ADDRESS</Form.Label>
                             <Form.Control
                             type="text"
                             Name="Store Address"
@@ -123,9 +112,8 @@ export class EditStoreModal extends Component{
                             placeholder="Enter Store Address"/>
                         </Form.Group>
 
-                        <Button variant="primary" type="submit">
-                            Save 
-                        </Button>
+                        <Button className= 'ml-0 mt-2' variant="dark" onClick={this.props.onHide}>Cancel</Button>
+                        <Button className= 'ml-3 mt-2' variant="success"type="submit"> Edit </Button>
 
                     </Form>
                 </Col>
@@ -134,9 +122,7 @@ export class EditStoreModal extends Component{
             
        
 </Modal.Body>
-      <Modal.Footer>
-            <Button  variant="danger" onClick={this.props.onHide}>Close</Button>
-      </Modal.Footer>
+      
 </Modal>
 </div>
         );

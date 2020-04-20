@@ -9,13 +9,22 @@ import orderBy from 'lodash/orderBy';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
+import paginationFactory,{ PaginationProvider } from 'react-bootstrap-table2-paginator';
+import Pagination from '@material-ui/lab/Pagination';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
+import BootstrapTable from 'react-bootstrap-table-next';
+
 
 
 const invertDirection = {
     asc :'desc',
     desc : 'asc'
 }
-
+const customTotal = (from, to, size) => (
+    <span className="react-bootstrap-table-pagination-total">
+      Showing { from } to { to } of { size } Results
+    </span>
+  );
 
 //Sales Component class
 export class Sales extends Component
@@ -25,8 +34,100 @@ export class Sales extends Component
         {
              super(props);
              this.state={sal:[], addModalShow :false , editModalShow : false,
-                                columnToSort :'Id',sortDirection:'asc'}
+                                columnToSort :'Id',sortDirection:'asc',activePage: 5,
+                                columns: [
+                                    {  
+                                      dataField: 'PName',
+                                      text: 'Product',  
+                                      sort:true
+                                     }, 
+                                     {  
+                                       dataField: 'CName',
+                                       text: 'Customer',  
+                                       sort:true
+                                     }, 
+
+                                     {  
+                                        dataField: 'SName',
+                                        text: 'Store',  
+                                        sort:true
+                                     },  
+                                     {  
+                                        dataField: 'DateSold',
+                                        text: 'DateSold',  
+                                        type:Date,
+                                        sort:false,
+                                        hidden:true
+                                      }, 
+                                      
+                                      {  
+                                        dataField: 'DS',
+                                        text: 'DateSold',  
+                                        type:Date,
+                                        sort:true,
+                                        hidden:false
+                                      },  
+
+
+                                      {  
+                                        dataField: 'ProductId',
+                                        text: 'ProductId',  
+                                        sort:true,
+                                        hidden:true
+                                      }, 
+
+                                      {  
+                                        dataField: 'CustomerId',
+                                        text: 'CustomerId',  
+                                        sort:true,
+                                        hidden:true
+                                      }, 
+
+                                      {  
+                                        dataField: 'StoreId',
+                                        text: 'StoreId',  
+                                        sort:true,
+                                        hidden:true
+                                      }, 
+
+
+                                        
+                                      {
+                                        dataField: "Actions",
+                                        text: "Actions",
+                                        formatter: this.linkAction,
+                                        sort: false
+                                      }]
+                        }
+
         }
+    linkAction = (cell, row, rowIndex, formatExtraData) => {
+         return (
+            <div>
+            <Button
+                className='m-2' variant="info"
+                 onClick = {() =>this.setState({editModalShow:true, salId:row.Id,  salProductId:row.ProductId,  
+                    salCustomerId:row.CustomerId,salStoreId:row.StoreId, salDateSold:row.DateSold,
+                    salPName:row.PName,salCName:row.CName,salSName:row.SName,salDS:row.DS })
+                }
+                    >
+                    Edit
+                </Button>
+   
+              
+              
+            <Button className='m-2' variant="danger"
+              onClick={() => {
+               this.deletesal(row.Id);
+              }}
+            >
+              Delete
+            </Button>
+            </div>
+            
+   
+       );
+   };  
     
 
 //This is to load sales details when react DOM is mounted
@@ -34,10 +135,6 @@ export class Sales extends Component
     {
         this.getSales();
     }
-
-
-
-
 
  //This function is to fetch the sales details by implementing GET API method.
 
@@ -47,7 +144,7 @@ export class Sales extends Component
     getSales()
     {
         
-        fetch('https://localhost:44340/api/Sales')
+        fetch('https://demotalent.azurewebsites.net/api/Sales')
         .then(response=>response.json())
         .then(data=> {
             this.setState({sal:orderBy(data,this.state.columnToSort,this.state.sortDirection)});
@@ -67,7 +164,7 @@ export class Sales extends Component
     {
         if( window.confirm('Are you sure?'))
         {
-            fetch('https://localhost:44340/api/Sales/'+salId,{
+            fetch('https://demotalent.azurewebsites.net/api/Sales/'+salId,{
              method:'DELETE',
             header:{'Accept ': 'application/json',
                     'Content-Type':'application/json'
@@ -104,17 +201,47 @@ export class Sales extends Component
     render()
     {
         
-        const{sal,salId,salProductId,salCustomerId,salStoreId,salDateSold}= this.state;
+        const{sal,salId,salProductId,salCustomerId,salStoreId,salDateSold,salPName,salCName,salSName,salDS
+        }= this.state;
         let addModalClose =() => this.setState({addModalShow : false});
         let editModalClose =() => this.setState({editModalShow : false});
+        
+               
+        const  options = {
+            paginationSize: 4,
+            pageStartIndex: 1,
+            // alwaysShowAllBtns: true, // Always show next and previous button
+            // withFirstAndLast: false, // Hide the going to First and Last page button
+            // hideSizePerPage: true, // Hide the sizePerPage dropdown always
+            // hidePageListOnlyOnePage: true, // Hide the pagination list when only one page
+            firstPageText: 'First',
+            prePageText: 'Back',
+            nextPageText: 'Next',
+            lastPageText: 'Last',
+            nextPageTitle: 'First page',
+            prePageTitle: 'Pre page',
+            firstPageTitle: 'Next page',
+            lastPageTitle: 'Last page',
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+              text: '5', value: 5
+            }, {
+              text: '10', value: 10
+            }, {
+              text: 'All', value:this.state.sal.length
+            }] // A numeric array is also available. the purpose of above example is custom the text
+          };
+             
 
       return(
         <div>
-            <ButtonToolbar className= 'mt-3'>
+            <ButtonToolbar className= 'mt-3 mb-3'>
                 <Button 
                  variant='primary'
                  onClick={()=> this.setState({addModalShow:true})} >
-                 Add Sales
+                 New Sales
                 </Button>
 
 
@@ -123,100 +250,31 @@ export class Sales extends Component
                onHide={addModalClose}/>
            </ButtonToolbar>
 
-                 <Table className='mt-4' striped bordered hover size="sm">
-                <thead>
-                    <tr>
-                        <th><div 
-                        onClick={()=>this.handleSort('Id')}>
-                        <span>Id</span>                           
-                        {this.state.columnToSort==='Id'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div></th>
+           <BootstrapTable 
+                        bootstrap4
+                        striped  
+                        hover  
+                        keyField='id'   
+                        data={ this.state.sal }   
+                       columns={ this.state.columns } 
+                       pagination={ paginationFactory(options) }>
 
-                        <th><div 
-                        onClick={()=>this.handleSort('PName')}>
-                        <span>Product Name</span>                           
-                        {this.state.columnToSort==='PName'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div></th>
-
-                        <th><div 
-                        onClick={()=>this.handleSort('CName')}>
-                        <span>Customer Name</span>                           
-                        {this.state.columnToSort==='CName'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div></th> 
-
-                        <th><div 
-                        onClick={()=>this.handleSort('SName')}>
-                        <span>Store Name</span>                           
-                        {this.state.columnToSort==='SName'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div></th>
-
-                        <th><div 
-                        onClick={()=>this.handleSort('DateSold')}>
-                        <span>Date of Sale</span>                           
-                        {this.state.columnToSort==='DateSold'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div></th> 
-                        
-                        <th>Action</th>                          
-                    </tr>
-                </thead>
-                <tbody>
-                    {sal.map(sal=>
-                        <tr key={sal.Id}>
-                         <td>{sal.Id}</td>
-                        <td>{sal.PName}</td>
-                        <td>{sal.CName}</td>
-                        <td>{sal.SName}</td>
-                        <td>{sal.DateSold}</td>
-                        <td>
-           <ButtonToolbar>
-
-                 <Button
-                    className='m-2' variant="info"
-                    onClick = {() =>this.setState({editModalShow:true, salId:sal.Id,  salProductId:sal.ProductId,  salCustomerId:sal.CustomerId,   salStoreId:sal.StoreId, salDateSold:sal.DateSold })}
-                    >
-                    Edit
-                </Button>
-
-
-                <Button className='m-2'
-                onClick={() =>this.deletesal(sal.Id)} variant="danger">
-                Delete    
-                </Button>
-
-
+            </BootstrapTable>  
                 <EditSalesModal
                 show={this.state.editModalShow}
                 onHide={editModalClose}
-                //{()=>this.setState({editModalShow:false})}
                 salId={salId}
                 salProductId={salProductId}
                 salCustomerId={salCustomerId}
                 salStoreId={salStoreId}
+                salPName={salPName}
+                salCName={salCName}
+                salSName={salSName}
                 salDateSold={salDateSold}
+                salDS={salDS}
                  />
 
-            </ButtonToolbar>
-
-
-
-                        </td>
-                        </tr>
-                        )}
-                </tbody>
-
-
-            </Table>
-
+        
  </div>           
 
         )

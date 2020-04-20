@@ -3,18 +3,27 @@
 import React,{Component} from 'react';
 import {Table} from 'react-bootstrap';
 import {Button,ButtonToolbar}  from 'react-bootstrap';
-import { AddCustModal } from './AddCustModal';//importing Customer Modal to 
-import {EditCustModal} from './EditCustModal';//importing Customer Modal
+import { AddCustModal } from './AddCustModal';
+import {EditCustModal} from './EditCustModal';
 import orderBy from 'lodash/orderBy';
+import BootstrapTable from 'react-bootstrap-table-next';
 import SwapVertIcon from '@material-ui/icons/SwapVert';
 import KeyboardArrowDownOutlinedIcon from '@material-ui/icons/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@material-ui/icons/KeyboardArrowUpOutlined';
-
+import paginationFactory,{ PaginationProvider } from 'react-bootstrap-table2-paginator';
+import Pagination from '@material-ui/lab/Pagination';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 
 const invertDirection = {
-    asc :'desc',
-    desc : 'asc'
+  asc :'desc',
+  desc : 'asc'
 }
+const customTotal = (from, to, size) => (
+  <span className="react-bootstrap-table-pagination-total">
+    Showing { from } to { to } of { size } Results
+  </span>
+);
+
 
 //Customer component class 
 export class Customer extends Component{
@@ -22,14 +31,60 @@ export class Customer extends Component{
     constructor(props)
     {
         super(props);
+        this.editClose.bind(this);
         this.state={cust:[], addModalShow :false , editModalShow : false,
-                    columnToSort :'Id',sortDirection:'asc'}
+                    columnToSort :'Id',sortDirection:'asc',activePage: 5,
+                    columns: [
+                      {  
+                        dataField: 'Id',  
+                        text: 'Id',
+                        sort : false,
+                        hidden:true
+                        }, 
 
-    //this.handleSort=this.handleSort.bind(this)
-    }
+                        {  
+                         dataField: 'Name',
+                        text: 'Name',  
+                        sort:true
+                        }, 
 
-  
+                        {  
+                          dataField: 'Address',
+                               text: 'Address',  
+                               sort: true  
+                        },
+                        {
+                                dataField: "Actions",
+                                text: "Actions",
+                                formatter: this.linkAction,
+                                sort: false
+                                
+                         } ]
+ }
 
+  }
+
+   //this is for Edit and Delete button 
+     linkAction = (cell, row, rowIndex, formatExtraData) => {
+         return (
+           <div>
+           <Button className ='m-2' variant="info"
+             onClick={() => {
+                
+               this.setState({editModalShow:true, custId:row.Id,custName:row.Name,custAddress:row.Address})
+
+                 }} >
+             Edit
+           </Button>
+                      <Button className='m-2' variant="danger"
+           onClick={() => {
+             this.deleteCust(row.Id);
+             }} > Delete</Button>
+         </div>
+    );
+};
+    
+//this.handleSort=this.handleSort.bind(this)
 
  ///This is to load customer details when react DOM is mounted
 
@@ -39,7 +94,6 @@ export class Customer extends Component{
     }
 
 
-
     //This function is to fetch the customer details by implementing GET API method.
 
     //Refresh list call the API to get the customer details list
@@ -47,7 +101,7 @@ export class Customer extends Component{
     getCustomer()
     {
         
-        fetch('https://localhost:44340/api/Customer')
+        fetch('https://demotalent.azurewebsites.net/api/Customer')
         .then(response=>response.json())
         .then(data=> {
             this.setState({cust:orderBy(data,this.state.columnToSort,this.state.sortDirection)});
@@ -58,16 +112,23 @@ export class Customer extends Component{
     //Retrieve Customer details upon update
     componentDidUpdate()
    {
-   this.getCustomer();
+     this.getCustomer();
    
     }
+      
+    editClose()
+    {
+      console.log('In Customer');
+    }
 
+      
    //Delete Customer details
+
     deleteCust(custId)
     {
         if( window.confirm('Are you sure?'))
         {
-            fetch('https://localhost:44340/api/Customer/'+custId,
+            fetch('https://demotalent.azurewebsites.net/api/Customer/'+custId,
             {
                  method:'DELETE',
                  header:{'Accept ': 'application/json',
@@ -89,8 +150,7 @@ export class Customer extends Component{
             )
         }
     }
-
-     
+    
     handleSort(props)
     {
        
@@ -112,15 +172,44 @@ export class Customer extends Component{
         const{cust,custId,custName,custAddress}= this.state;
         let addModalClose =() => this.setState({addModalShow : false});
         let editModalClose =() => this.setState({editModalShow : false});
+
+        
+            // alwaysShowAllBtns: true, // Always show next and previous button
+            // withFirstAndLast: false, // Hide the going to First and Last page button
+            // hideSizePerPage: true, // Hide the sizePerPage dropdown always
+            // hidePageListOnlyOnePage: true, // Hide the pagination list when only one page
+
+        const  options = {
+            paginationSize: 4,
+            pageStartIndex: 1,
+            firstPageText: 'First',
+            prePageText: 'Back',
+            nextPageText: 'Next',
+            lastPageText: 'Last',
+            nextPageTitle: 'First page',
+            prePageTitle: 'Pre page',
+            firstPageTitle: 'Next page',
+            lastPageTitle: 'Last page',
+            showTotal: true,
+            paginationTotalRenderer: customTotal,
+            disablePageTitle: true,
+            sizePerPageList: [{
+              text: '5', value: 5
+            }, {
+              text: '10', value: 10
+            }, {
+              text: 'All', value:this.state.cust.length
+            }] 
+          };
              
       return(
             <div>
-        <ButtonToolbar className= 'mt-3'>
+        <ButtonToolbar className= 'mt-3 mb-3'>
 
             <Button 
                  variant='primary'
                  onClick={()=> this.setState({addModalShow:true})} >
-                Add Customer
+               New Customer
             </Button>
 
             <AddCustModal
@@ -128,83 +217,24 @@ export class Customer extends Component{
                  onHide={addModalClose}/>
         </ButtonToolbar>
 
+          <BootstrapTable 
+                       bootstrap4
+                       striped  
+                       hover  
+                       keyField='id'   
+                       data={ this.state.cust }   
+                       columns={ this.state.columns } 
+                       pagination={ paginationFactory(options) }>
 
-         <Table className='mt-4' striped bordered hover size="sm"
-         //cust={orderBy(this.state.cust,this.state.columnToSort,this.state.sortDirection)}
-         >
-             
-                <thead>
-                    <tr>
-                        <th><div 
-                        onClick={()=>this.handleSort('Id')}>
-                        <span>Id</span>                           
-                        {this.state.columnToSort==='Id'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div></th>
-
-                        <th><div 
-                        onClick={()=>this.handleSort('Name')}>
-                        <span>Name</span>                           
-                        {this.state.columnToSort==='Name'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div> </th>
-
-
-                        <th><div 
-                        onClick={()=>this.handleSort('Address')}>
-                        <span>Address</span>                           
-                        {this.state.columnToSort==='Address'?
-                         this.state.sortDirection==='asc'?<KeyboardArrowUpOutlinedIcon/>:<KeyboardArrowDownOutlinedIcon/>
-                         :null }                       
-                        </div> </th> 
-
-                        <th>Action</th>  
-
-                    </tr>
-                </thead>
-                <tbody>
-                    {cust.map(cust=>
-                        <tr key={cust.Id}>
-                        <td>{cust.Id}</td>
-                        <td>{cust.Name}</td>
-                        <td>{cust.Address}</td>
-                        <td>
-
-                <ButtonToolbar>
-
-                     <Button
-                         className='m-2' variant="info"
-                         onClick = {() =>this.setState({editModalShow:true, custId:cust.Id,custName:cust.Name,custAddress:cust.Address})}>
-                         Edit
-                     </Button>
-
-
-                     <Button className='m-2'
-                        onClick={() =>this.deleteCust(cust.Id)} variant="danger">
-                         Delete    
-                     </Button>
-
-
-                     <EditCustModal
+            </BootstrapTable> 
+            
+            <EditCustModal
                          show={this.state.editModalShow}
                          onHide={editModalClose}
-                         //{()=>this.setState({editModalShow:false})}
                          custId={custId}
                          custName={custName}
-                         custAddress={custAddress}/>
-
-                
-
-                 </ButtonToolbar>
-
-                        </td>
-                        </tr>
-                         )}
-                </tbody>
-            </Table>
-
+                         custAddress={custAddress} />
+               
  </div>           
 
         )

@@ -4,6 +4,8 @@ import React,{Component} from 'react';
 import {Modal,Button,Row,Col,Form, Container } from 'react-bootstrap';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
+import Alert from 'react-bootstrap/Alert';
+import { dark } from '@material-ui/core/styles/createPalette';
 
 
 //Add customer component class
@@ -12,8 +14,9 @@ export class AddCustModal extends Component{
         super(props);
         this.state={snackbaropen: false,snackbarmsg: ''};
         this.handleSubmit = this.handleSubmit.bind(this);
-
     }
+
+
 
     snackbarClose = (event)=>{
         this.setState({snackbaropen:false});
@@ -24,8 +27,21 @@ export class AddCustModal extends Component{
 
     handleSubmit(event){
         event.preventDefault();
+        console.log(event.target.Name.value.length,event.target.Name.value.trim().length);
+        if(event.target.Name.value.trim().length==0)
+       { 
+        console.log('Here');
+        this.setState({snackbaropen:true,snackbarmsg:'Enter Valid Customer Name'});
+       }
+      else if(event.target.Address.value.trim().length==0)
+       {
+        this.setState({snackbaropen:true,snackbarmsg:'Enter Valid Address'});
 
-        fetch('https://localhost:44340/api/Customer',{
+       }
+     
+        else
+        {
+         fetch('https://demotalent.azurewebsites.net/api/Customer',{
             method:'POST',
             headers:{
                 'Accept':'application/json',
@@ -36,7 +52,7 @@ export class AddCustModal extends Component{
                 Name: event.target.Name.value,
                 Address:event.target.Address.value
             })
-        })
+         })
         .then(res=> res.json())
         .then((result)=>
         {
@@ -46,11 +62,11 @@ export class AddCustModal extends Component{
         },
         (error)=>{
             this.setState({snackbaropen:true, snackbarmsg:'Failed'});
-        }
-        )
-
+        })
+       }
         
     }
+
 
 
     render(){
@@ -66,7 +82,7 @@ export class AddCustModal extends Component{
                     <IconButton
                         Key="close"
                         arial-label="close"
-                        color="inherit"
+                        color='dark'
                         onClick={this.snackbarClose}>x
                     </IconButton>
                     ]}
@@ -78,9 +94,9 @@ export class AddCustModal extends Component{
                     aria-labelledby="contained-modal-title-vcenter"
                     centered>
                      
-                <Modal.Header closeButton>
+                <Modal.Header >
                     <Modal.Title id="contained-modal-title-vcenter">
-                     Add New Customer
+                     Create Customer
                     </Modal.Title>
                 </Modal.Header>
 
@@ -89,31 +105,39 @@ export class AddCustModal extends Component{
                 <Row>
                     <Col sm={6}>
                         <Form onSubmit={this.handleSubmit}>
+                         
+                         
                          <Form.Group controlId="Name">
-                                <Form.Label>Name</Form.Label>
+                                <Form.Label>NAME</Form.Label>
                                 <Form.Control
                                     type="text"
                                     Name="Customer Name"
                                     required
-                                    placeholder="Enter customer Name"/>
+                                    placeholder="Enter customer Name"
+                                    //pattern="[a-zA-Z]{3}"
+                                    //title="Enter valid Name"
+                                    
+                                    />
                          </Form.Group>
 
 
 
                          <Form.Group controlId="Address">
-                            <Form.Label>Addresss</Form.Label>
+                            <Form.Label>ADDRESS</Form.Label>
                             <Form.Control
                             type="text"
                             Name="Customer Address"
                             required
-                            placeholder="Enter customer Address"/>
+                            placeholder="Enter customer Address" 
+                            //id="message" 
+                            //pattern="[a-zA-Z]{3}"
+                             />
                          </Form.Group>
 
-
-                            <Button variant="primary" type="submit">
-                             Add Customer
+                            <Button  variant="dark"  className= 'ml-2' onClick={this.props.onHide}>Cancel</Button>
+                            <Button variant="success" className= 'ml-3' type="submit">
+                             Create
                             </Button>
-
                         </Form>
                     </Col>
                 </Row>
@@ -122,7 +146,7 @@ export class AddCustModal extends Component{
 
             
          <Modal.Footer>
-            <Button  variant="danger" onClick={this.props.onHide}>Close</Button>
+            
         </Modal.Footer>
 </Modal>
 </div>

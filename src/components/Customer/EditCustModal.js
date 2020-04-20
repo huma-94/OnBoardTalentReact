@@ -23,15 +23,17 @@ export class EditCustModal extends Component{
     //this is to Edit customer details
     handleSubmit(event){
         event.preventDefault();
+        //console.log(this.props.custId,event.target.Name.value,event.target.Address.value);
 
-        fetch('https://localhost:44340/api/Customer',{
-            method:'PUT',
+        fetch('https://demotalent.azurewebsites.net/api/Customer',{
+
+             method:'PUT',
             headers:{
                 'Accept':'application/json',
                 'content-type':'application/json'
             },
             body:JSON.stringify({
-                Id:event.target.Id.value,
+                Id:this.props.custId,
                 Name: event.target.Name.value,
                 Address:event.target.Address.value
             })
@@ -79,7 +81,7 @@ export class EditCustModal extends Component{
       aria-labelledby="contained-modal-title-center"
       centered
     >
-<Modal.Header closeButton>
+<Modal.Header>
         <Modal.Title id="contained-modal-title-vcenter">
           Edit  Customer
         </Modal.Title>
@@ -90,17 +92,6 @@ export class EditCustModal extends Component{
                 <Col sm={6}>
                     <Form onSubmit={this.handleSubmit}>
 
-                    <Form.Group controlId="Id">
-                            <Form.Label>Id</Form.Label>
-                            <Form.Control
-                            type="text"
-                            Name="Customer Id"
-                            required
-                            disabled
-                            defaultValue={this.props.custId}
-                            placeholder="Customer Id"/>
-                        </Form.Group>
-
                         <Form.Group controlId="Name">
                             <Form.Label>Name</Form.Label>
                             <Form.Control
@@ -110,6 +101,7 @@ export class EditCustModal extends Component{
                             defaultValue={this.props.custName}
                             placeholder="Enter customer Name"
                             />
+                         
                         </Form.Group>
 
                         <Form.Group controlId="Address">
@@ -119,21 +111,19 @@ export class EditCustModal extends Component{
                             Name="Customer Address"
                             required
                             defaultValue={this.props.custAddress}
-                            placeholder="Enter customer Address"/>
-                        </Form.Group>
-                        <Button variant="primary" type="submit">
-                            Save 
-                        </Button>
-
+                            placeholder="Enter customer Address" 
+                            />
+                        </Form.Group>                       
+                           
+                            <Button className= 'ml-0 mt-2' variant="dark" onClick={this.props.onHide}>Cancel</Button>  
+                            <Button  className= 'ml-3 mt-2' variant="success" type="submit"> Edit </Button>  
                     </Form>
                 </Col>
 
             </Row>
        
 </Modal.Body>
-      <Modal.Footer>
-        <Button  variant="danger" onClick={this.props.onHide}>Close</Button>
-      </Modal.Footer>
+     
 </Modal>
 </div>
         );

@@ -25,15 +25,16 @@ export class EditPrdModal extends Component{
 
     handleSubmit(event){
         event.preventDefault();
+        console.log(this.props.prdId);
 
-        fetch('https://localhost:44340/api/Product',{
+        fetch('https://demotalent.azurewebsites.net/api/Product',{
             method:'PUT',
             headers:{
                 'Accept':'application/json',
                 'content-type':'application/json'
             },
             body:JSON.stringify({
-                Id:event.target.Id.value,
+                Id:this.props.prdId,
                 Name: event.target.Name.value,
                 Price:event.target.Price.value
             })
@@ -81,7 +82,7 @@ export class EditPrdModal extends Component{
         centered
     >
 
-    <Modal.Header closeButton>
+    <Modal.Header >
         <Modal.Title id="contained-modal-title-vcenter">
           Edit Product
         </Modal.Title>
@@ -93,43 +94,32 @@ export class EditPrdModal extends Component{
                 <Col sm={6}>
                     <Form onSubmit={this.handleSubmit}>
 
-                    <Form.Group controlId="Id">
-                            <Form.Label>Id</Form.Label>
-                            <Form.Control
-                            type="text"
-                            Name="Product Id"
-                            required
-                            disabled
-                            defaultValue={this.props.prdId}
-                            placeholder="Product Id"/>
-                        </Form.Group>
-
-
                         <Form.Group controlId="Name">
-                            <Form.Label>Name</Form.Label>
+                            <Form.Label>NAME</Form.Label>
                             <Form.Control
                             type="text"
                             Name="Product Name"
                             required
                             defaultValue={this.props.prdName}
                             placeholder="Enter Product Name"
-                            />
+                           />
                         </Form.Group>
 
 
                         <Form.Group controlId="Price">
-                            <Form.Label>Price</Form.Label>
+                            <Form.Label>PRICE</Form.Label>
                             <Form.Control
                             type="text"
                             Name="Product Price"
                             required
                             defaultValue={this.props.prdPrice}
-                            placeholder="price"
-                            />
+                            placeholder="Enter Product Price"
+                           />
+                           
                         </Form.Group>
-
-                        <Button variant="primary" type="submit">
-                            Save 
+                        <Button  variant="dark"   className= 'ml-0 mt-2'onClick={this.props.onHide}>Cancel</Button>
+                        <Button variant="success"  className= 'ml-3 mt-2'type="submit">
+                            Edit 
                         </Button>
 
                          </Form>
@@ -137,9 +127,7 @@ export class EditPrdModal extends Component{
              </Row>
        
         </Modal.Body>
-             <Modal.Footer>
-                 <Button  variant="danger" onClick={this.props.onHide}>Close</Button>
-             </Modal.Footer>
+             
     </Modal>
 </div>
         );

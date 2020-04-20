@@ -26,8 +26,20 @@ export class AddPrdModal extends Component{
     handleSubmit(event)
     {
         event.preventDefault();
+        console.log(event.target.Name.value.length,event.target.Name.value.trim().length);
+        if(event.target.Name.value.trim().length==0)
+       { 
+        console.log('Here');
+        this.setState({snackbaropen:true,snackbarmsg:'Enter Valid Product Name'});
+       }
+       else if(event.target.Price.value.trim().length==0)
+       {
+        this.setState({snackbaropen:true,snackbarmsg:'Enter Valid Price'});
 
-        fetch('https://localhost:44340/api/Product',{
+       }
+       else{
+
+        fetch('https://demotalent.azurewebsites.net/api/Product',{
             method:'POST',
             headers:{
                 'Accept':'application/json',
@@ -50,6 +62,7 @@ export class AddPrdModal extends Component{
             this.setState({snackbaropen:true, snackbarmsg:'Failed'});
         }
         )
+    }
 
         
     }
@@ -82,9 +95,9 @@ export class AddPrdModal extends Component{
                     centered
     >
     
-            <Modal.Header closeButton>
+            <Modal.Header >
                 <Modal.Title id="contained-modal-title-vcenter">
-                     Add New Product
+                     Create Product
                 </Modal.Title>
 
                 </Modal.Header>
@@ -95,27 +108,27 @@ export class AddPrdModal extends Component{
                             <Form onSubmit={this.handleSubmit}>
 
                             <Form.Group controlId="Name">
-                                <Form.Label>Name</Form.Label>
+                                <Form.Label>NAME</Form.Label>
                                 <Form.Control
                                 type="text"
                                 Name="Product Name"
                                 required
-                                placeholder="Enter product Name"/>
+                                placeholder="Enter product Name"
+                               />
                             </Form.Group>
 
                             <Form.Group controlId="Price">
-                               <Form.Label> Price</Form.Label>
+                               <Form.Label> PRICE</Form.Label>
                                  <Form.Control
                                  type="text"
                                  Name="Price"
                                  required
-                                 placeholder="Price"/>
+                                 placeholder="Enter Product Price"
+                                />
                             </Form.Group>
 
-
-                        <Button variant="primary" type="submit">
-                            Add Product Price
-                        </Button>
+                        <Button  variant="dark" className= 'ml-0 mt-2' onClick={this.props.onHide}>Cancel</Button>
+                        <Button variant="success"  className= 'ml-3 mt-2'type="submit">Create</Button>
 
                     </Form>
                 </Col>
@@ -123,12 +136,8 @@ export class AddPrdModal extends Component{
             </Row>
 
        
-</Modal.Body>
-      <Modal.Footer>
-        <Button  variant="danger" onClick={this.props.onHide}>Close</Button>
-      </Modal.Footer>
-
-      
+        </Modal.Body>
+     
 </Modal>
 </div>
         );
